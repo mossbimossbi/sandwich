@@ -3,6 +3,8 @@ use Firebase\JWT\JWT;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use Ramsey\Uuid\Uuid;
+use Respect\Validation\Validator as v;
+use \DavidePastore\Slim\Validation\Validation as sv;
 
 require_once '../src/vendor/autoload.php';
 
@@ -31,7 +33,6 @@ $app = new \Slim\App([
 ]);
 
 $container = $app->getContainer();
-
 
 
 //======================================================================
@@ -183,12 +184,26 @@ $app->post('/categorie[/]',
 
     });
 
+//VALIDATOR
+$validators = [
+  'nom_client'=>v::StringType()->alpha()->notEmpty(),
+  'mail_client'=>v::email()->notEmpty(),
+  'date'=>v::date('Y-m-d')->min('now')->notEmpty(),
+  //'heure'=>
+];
 
     //======================================================================
     // Registrar un commande
     //======================================================================
     $app->post('/commande[/]',
     	function (Request $request, Response $response, $args){
+            if($request->getAttribute('has_errors')){
+               $errors = $request->getAttribute('errors');
+               $response = $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+              $response->getBody()->write(json_encode($errors ));
+              return $response;
+            }else{
+
         $data = $request->getParsedBody();
 
         if (!isset($data['nom_client'])) return $response->withStatus(400);
@@ -221,7 +236,8 @@ $app->post('/categorie[/]',
         $response = $response->withStatus(201)->withHeader('Content-Type', 'application/json');
   			$response->getBody()->write(json_encode($savedCommande));
   			return $response;
-      });
+        }
+      })->add(new sv($validators));
 
       //======================================================================
       // Recuperar une commande
