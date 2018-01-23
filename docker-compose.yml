@@ -19,7 +19,7 @@ networks:
 services:
   api.public:
     image: canals/php
-    container_name: api.public.lbs.local
+    container_name: api.lbs.local
     environment:
       - VHOST_HOSTNAME=api.lbs.local
       - VHOST_DOCROOT=/var/www/api
