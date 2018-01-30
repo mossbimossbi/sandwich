@@ -1,4 +1,6 @@
 <?php
+
+/*ESTE ES EL BUENO*/
 require __DIR__ . '/../src/vendor/autoload.php';
 require __DIR__ . '/../src/control/control.php'; 
 
