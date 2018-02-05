@@ -1,20 +1,17 @@
 <?php
-namespace lbs\models;
+namespace api\Models;
 
 class Categorie extends \Illuminate\Database\Eloquent\Model {
 
-       protected $table      = 'categorie';  /* le nom de la table */
-       protected $primaryKey = 'id';     /* le nom de la clé primaire */
-       public    $timestamps = false;    /* si vrai la table doit contenir
-                                            les deux colonnes updated_at,
-                                            created_at */
-	/*
+  protected $table      = 'categorie';
+  protected $primaryKey = 'id';
+  public    $timestamps = false;
+
 	public function sandwiches() {
-		return $this->hasMany(	'lbs\models\Sandwich',
+		return $this->hasMany(	'api\Models\Sandwich',
 								'sand2cat',
 								'cat_id',
 								'sand_id');
 	}
-*/
-
+  
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace lbs\control;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use lbs\model\Sandwich;

@@ -1,15 +1,16 @@
 <?php
-
-/*ESTE ES EL BUENO*/
 require __DIR__ . '/../src/vendor/autoload.php';
-require __DIR__ . '/../src/control/control.php'; 
+require __DIR__ . '/../src/control/control.php';
+require __DIR__ . '/../src/models/Sandwich.php';
+require __DIR__ . '/../src/models/Categorie.php';
+require __DIR__ . '/../src/models/Commande.php';
+require __DIR__ . '/../src/models/Taille.php';
 
 use Firebase\JWT\JWT;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use Ramsey\Uuid\Uuid;
 use Respect\Validation\Validator as v;
-use \DavidePastore\Slim\Validation\Validation as sv;
 
 $config = parse_ini_file('../src/conf/lbs.db.conf.ini');
 
@@ -24,139 +25,18 @@ $app = new \Slim\App([
     ]
 ]);
 
-$container = $app->getContainer();
+$validators = [
+ 'nom_client'=>v::StringType()->alpha()->notEmpty(),
+ 'mail_client'=>v::email()->notEmpty(),
+ 'date'=>v::date('Y-m-d')->min('now')->notEmpty(),
+];
+
+require __DIR__ . '/../src/container/container.php';
 
 require __DIR__ . '/../src/route/routes.php';
 
 $app->run();
 
-
-//======================================================================
-// GESTON DE ERRORES
-//======================================================================
-
-//$container['notFoundHandler'] = function($c) {
-//	return function( $req, $resp ) {
-//		$resp= $resp->withStatus(400)->withHeader('Content-Type', 'application/json');
-//        $resp->getBody()->write( json_encode(['message'=>'Bad Request']));
-//        return $resp;
-//		// Debes hacelo en 2 pasos porque write no crea una requet, solo modifica una existente
-//	};
-//};
-//
-//$container['errorHandler'] = function($c) {
-//	return function( $req, $resp, $e ) {
-//		$resp= $resp->withStatus(500)->withHeader('Content-Type', 'application/json');
-//        $resp->getBody()->write( json_encode([$e])); // 'message'=>'Internal Server Error'
-//        return $resp;
-//	};
-//};
-//
-//$container['notAllowedHandler'] = function($c) {
-//	return function( $req, $resp, $methods ) {
-//		$resp= $resp->withStatus(405)->withHeader('Allow', implode(',', $methods), 'application/json');
-//        $resp->getBody()->write(json_encode($methods));
-//        return $resp;
-//		// Por si no lo notaste, $methods, es un array que guarda todos los metodos (GET, POST...), disponibles para esta URI
-//	};
-//};
-//
-////======================================================================
-//// Probando como funciona el contenedor de dependencias
-////======================================================================
-//$app->get('/hello/{name}',
-//	function(Request $req, Response $resp, $args) {
-//	$name = $args['name'];
-//	// Se accede igual que a un array de arrays
-//	echo $estadoDeProduccion = $this[ 'settings' ]['production'];
-//
-//});
-//
-////======================================================================
-//// Un Sandwich
-////======================================================================
-//
-//$app->get('/sandwiches/{id}',
-//	function(Request $req, Response $resp, $args) {
-//	$id = $args['id'];
-//
-//      try {
-//		$mySandwich = lbs\models\Sandwich::findOrFail($id);
-//
-//	  	$resp = $resp->withHeader('Content-Type', 'application/json');
-//		$resp->getBody()->write(json_encode($mySandwich));
-//		return $resp;
-//      } catch ( Illuminate\Database\Eloquent\ModelNotFoundException $e ) {
-//			$resp = $resp->withStatus(404)->withHeader('Content-Type', 'application/json');
-//			$resp->getBody()->write(json_encode('CHALES MAISTRO, NO TENEMOS ESE SANDWICH'));
-//			return $resp;
-//      }
-//
-//});
-//
-////======================================================================
-//// Todos los sandwiches
-////======================================================================
-//
-//$app->get('/sandwichs[/]',\lbs\control\SandwichController::class . ':getSandwich');
-//
-////======================================================================
-//// Una cateogoria
-////======================================================================
-//
-//
-//$app->get('/categories/{id}',
-//	function(Request $req, Response $resp, $args) {
-//	$id = $args['id'];
-//
-//	 try {
-//		$mycategorie = lbs\models\Categorie::findOrFail($id);
-//
-//	  	$resp = $resp->withHeader('Content-Type', 'application/json');
-//		$resp->getBody()->write(json_encode($mycategorie));
-//		return $resp;
-//    } catch ( Illuminate\Database\Eloquent\ModelNotFoundException $e ) {
-//       		$resp = $resp->withStatus(404)->withHeader('Content-Type', 'application/json');
-//			$resp->getBody()->write(json_encode('CHALES MAISTRO, NO TENEMOS ESA CATEGORIA'));
-//			return $resp;
-//  	}
-//
-//});
-//
-//
-////======================================================================
-//// Todas las categorias
-////======================================================================
-//
-///*
-//$app->get('/categories[/]',
-//	function(Request $req, Response $resp, $args) {
-//
-//	$categories = lbs\models\Categorie::select();
-//
-//  	$resp = $resp->withHeader('Content-Type', 'application/json');
-//	$resp->getBody()->write(json_encode($categories));
-//	return $resp;
-//
-//});
-//*/
-//
-////======================================================================
-//// Registrar un Sanwich
-////======================================================================
-//
-///*
-//$app->post('/sandwich[/]',
-//	function(Request $req, Response $resp, $args) {
-//		$data = $req->getParsedBody();
-//		$sandwich = new lbs\models\Sandwich();
-//		$sandwich->nom = $data['nom'];
-//		$sandwich->description = $data['description'];
-//		$sandwich->type_pain = $data['type_pain'];
-//		$sandwich->img = $data['img'];
-//});
-//*/
-//
 ////======================================================================
 //// Registrar una categoria
 ////======================================================================
@@ -181,12 +61,7 @@ $app->run();
 //    });
 //
 ////VALIDATOR
-//$validators = [
-//  'nom_client'=>v::StringType()->alpha()->notEmpty(),
-//  'mail_client'=>v::email()->notEmpty(),
-//  'date'=>v::date('Y-m-d')->min('now')->notEmpty(),
-//  //'heure'=>
-//];
+
 //
 //    //======================================================================
 //    // Registrar un commande
@@ -285,11 +160,7 @@ $app->run();
 //        });
 //
 //
-////======================================================================
-//// Modificar una cateogorîa
-////======================================================================
-//
-// $app->put('/categorie[/]', \lbs\control\Categoriescontroller::class . ':changeCategorie')->setName('categorie');
+
 //
 ////======================================================================
 ////PROBANDO EL FIREBASE
